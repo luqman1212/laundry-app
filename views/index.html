@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Laundry Sederhana</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Laundry Cepat & Bersih</h1>
+
+    <!-- Form Tambah Pesanan -->
+    <div class="form-tambah">
+      <h2>Tambah Pesanan</h2>
+      <form action="/tambah" method="POST">
+        <input type="text" name="nama" placeholder="Nama Pelanggan" required />
+        <input type="number" step="0.1" name="berat" placeholder="Berat (kg)" required />
+        <select name="jenis" required>
+          <option value="">Pilih Layanan</option>
+          <option value="Cuci Kering">Cuci Kering</option>
+          <option value="Cuci Setrika">Cuci + Setrika</option>
+          <option value="Setrika Saja">Setrika Saja</option>
+        </select>
+        <button type="submit">Tambah</button>
+      </form>
+    </div>
+
+    <!-- Daftar Pesanan -->
+    <div class="daftar-pesanan">
+      <h2>Daftar Pesanan</h2>
+      <div id="list-pesanan"></div>
+    </div>
+  </div>
+
+  <script>
+    async function loadPesanan() {
+      const res = await fetch('/pesanan');
+      const data = await res.json();
+      const list = document.getElementById('list-pesanan');
+      list.innerHTML = '';
+
+      if (data.length === 0) {
+        list.innerHTML = '<p class="kosong">Belum ada pesanan.</p>';
+        return;
+      }
+
+      data.forEach(p => {
+        const item = document.createElement('div');
+        item.className = 'pesanan-item';
+        item.innerHTML = `
+          <div>
+            <strong>${p.nama}</strong> - ${p.berat} kg<br>
+            <small>${p.jenis}</small>
+          </div>
+          <form action="/hapus/${p.id}" method="POST" style="display:inline;">
+            <button type="submit" class="hapus">Hapus</button>
+          </form>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    // Refresh otomatis setiap 3 detik
+    setInterval(loadPesanan, 3000);
+    loadPesanan(); // Pertama kali
+  </script>
+</body>
+</html>
